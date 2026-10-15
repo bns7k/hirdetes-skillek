@@ -16,7 +16,7 @@ A skillek hivatkoznak egymásra (pl. a `hirdetes-kep` a `hirdetes-video` képgen
 Másold a négy mappát a Claude Code skill-mappájába:
 
 ```bash
-git clone https://github.com/<felhasznalo>/hirdetes-skillek.git
+git clone https://github.com/bns7k/hirdetes-skillek.git
 cp -r hirdetes-skillek/hirdetes-kep hirdetes-skillek/html-kep hirdetes-skillek/kep-gyartas hirdetes-skillek/hirdetes-video ~/.claude/skills/
 ```
 
