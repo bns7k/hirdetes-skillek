@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="hu"><head><meta charset="utf-8">
+<!--
+  UI-ANIMACIO SABLON -- a termek/szolgaltatas "rendszere" mukodes kozben.
+  Kimasolod az ugyfel mappajaba, atirod a DATA-t es a jeleneteket, majd:
+      python scripts/ui_render.py anim.html --out media --proba   (probakockak)
+      python scripts/ui_render.py anim.html --out media            (-> media/ui-<jelenet>.mp4)
+
+  SZERZODES (ezt varja a ui_render.py):
+    window.SCENES = { nev: masodperc, ... }   a jelenetek es a hosszuk
+    window.render(nev, t)                      DETERMINISZTIKUS: ugyanarra a t-re
+                                               mindig ugyanazt rajzolja (nincs
+                                               setTimeout, nincs CSS-animacio, nincs Math.random)
+  SZABALYOK:
+    - Minden jelenet az ELOZO VEGALLAPOTABOL induljon -> egy folyamatnak latszik.
+    - A lenyeg (ami tortenik) 2-3 mp alatt fusson le; a make.py "speed":"fit" + "action"
+      ugyis a beathez igazitja.
+    - Szabad zonak 1080x1920-on: fent 0-200 (logo), lent 1400-tol (felirat + emoji).
+    - Allapotszin CSAK valodi allapotra (kesz/folyamatban/hiba), nem diszitesnek.
+    - A bemutato adat legyen hihetoen helyi (magyar nevek, telepulesek), de KITALALT.
+-->
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@500&display=block&subset=latin-ext" rel="stylesheet">
+<style>
+  /* MARKA: csak ezt a blokkot kell ugyfelenkent atirni */
+  :root{--bg:#06090F;--card:#0E131C;--line:rgba(255,255,255,.09);--txt:#EDF1F7;--mut:#8B95A6;
+        --accent:#8FB2FF;--ok:#3ED8A8;--warn:#F0B23C;--font:Geist,sans-serif;--mono:'Geist Mono',monospace}
+  html,body{margin:0;width:1080px;height:1920px;background:var(--bg);overflow:hidden;font-family:var(--font);color:var(--txt)}
+  .abs{position:absolute}
+  .label{font-family:var(--mono);font-size:24px;letter-spacing:3px;color:var(--accent)}
+  .title{font-size:58px;font-weight:600;letter-spacing:-1.5px}
+  .row{left:60px;width:960px;height:104px;border-radius:22px;background:var(--card);border:1px solid var(--line);
+       display:flex;align-items:center;box-sizing:border-box;padding:0 28px;font-size:34px}
+  .row span{flex:1}
+  .pill{height:52px;border-radius:26px;padding:0 22px;display:flex;align-items:center;font-size:25px;font-weight:500}
+  .p0{background:rgba(255,255,255,.05);color:var(--mut)} .p1{background:rgba(240,178,60,.14);color:var(--warn)}
+  .p2{background:rgba(62,216,168,.15);color:var(--ok)}
+</style></head>
+<body><div id="stage"></div>
+<script>
+// ---- ADAT: ezt ird at ------------------------------------------------------
+const DATA = {
+  label: "PELDA FOLYAMAT",
+  title: "Beerkezett igenyek",
+  rows: ["Kovács Péter", "Nagy Andrea", "Tóth Gábor", "Szabó Éva", "Horváth László"],
+  states: [["p0", "Új"], ["p1", "Folyamatban"], ["p2", "Kész ✓"]],
+};
+
+// ---- JELENETEK -------------------------------------------------------------
+window.SCENES = { betolt: 3.0, feldolgoz: 3.5 };
+
+const cl = (x) => Math.max(0, Math.min(1, x)), ease = (x) => 1 - Math.pow(1 - cl(x), 3);
+const at = (t, start, dur = 0.35) => ease((t - start) / dur);     // 0 -> 1 atmenet
+
+function state(scene, t) {
+  // sor-allapotok + lathato sorok szama; a masodik jelenet az elso VEGEROL indul
+  const st = DATA.rows.map(() => 0);
+  let vis = DATA.rows.length;
+  if (scene === "betolt") { vis = 0; DATA.rows.forEach((_, i) => { if (t >= 0.2 + i * 0.25) vis = i + 1; }); }
+  if (scene === "feldolgoz") DATA.rows.forEach((_, i) => {
+    if (t >= 0.2 + i * 0.4) st[i] = 1;
+    if (t >= 0.6 + i * 0.4) st[i] = 2;
+  });
+  return { st, vis };
+}
+
+window.render = function (scene, t) {
+  const s = state(scene, t);
+  let h = `<div class="abs label" style="left:60px;top:230px">${DATA.label}</div>
+           <div class="abs title" style="left:60px;top:272px">${DATA.title}</div>`;
+  for (let i = 0; i < s.vis; i++) {
+    const a = scene === "betolt" ? at(t, 0.2 + i * 0.25, 0.3) : 1;
+    const [cls, txt] = DATA.states[s.st[i]];
+    h += `<div class="abs row" style="top:${420 + i * 118 + (1 - a) * 40}px;opacity:${a}">
+            <span>${DATA.rows[i]}</span><div class="pill ${cls}">${txt}</div></div>`;
+  }
+  document.getElementById("stage").innerHTML = h;
+};
+</script></body></html>

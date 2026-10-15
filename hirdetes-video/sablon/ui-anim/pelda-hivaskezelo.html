@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="hu"><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@500&display=block&subset=latin-ext" rel="stylesheet">
+<style>
+  :root{--bg:#06090F;--card:#0E131C;--card2:#141A24;--line:rgba(255,255,255,.09);--txt:#EDF1F7;--mut:#8B95A6;
+        --brand:#2F6BFF;--b300:#8FB2FF;--mint:#3ED8A8;--amber:#F0B23C}
+  html,body{margin:0;width:1080px;height:1920px;background:var(--bg);overflow:hidden;font-family:Geist,sans-serif;color:var(--txt)}
+  #stage{position:absolute;inset:0}
+  .abs{position:absolute}
+  .label{font-family:'Geist Mono',monospace;font-size:24px;letter-spacing:3px;color:var(--b300)}
+  .title{font-size:58px;font-weight:600;letter-spacing:-1.5px}
+  .sub{font-size:28px;color:var(--mut)}
+  .counter{height:74px;border-radius:37px;background:var(--card);border:1px solid var(--line);display:flex;align-items:center;gap:14px;padding:0 28px;font-size:28px;color:var(--mut)}
+  .counter b{color:var(--txt);font-family:'Geist Mono',monospace;font-size:32px;font-weight:500}
+  .row{left:60px;width:960px;height:104px;border-radius:22px;background:var(--card);border:1px solid var(--line);display:flex;align-items:center;box-sizing:border-box;padding:0 26px}
+  .row.hl{border-color:rgba(97,145,255,.55);background:#101828}
+  .av{width:60px;height:60px;border-radius:30px;background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:600;color:var(--mut);flex:none}
+  .who{margin-left:22px;flex:1;min-width:0}
+  .nm{font-size:34px;font-weight:500;letter-spacing:-.5px}
+  .ds{font-size:24px;color:var(--mut);margin-top:4px;white-space:nowrap}
+  .pill{height:52px;border-radius:26px;padding:0 22px;display:flex;align-items:center;gap:10px;font-size:25px;font-weight:500;white-space:nowrap;flex:none}
+  .p-wait{background:rgba(255,255,255,.05);color:var(--mut)}
+  .p-call{background:rgba(47,107,255,.18);color:var(--b300)}
+  .p-miss{background:rgba(240,178,60,.14);color:var(--amber)}
+  .p-sms{background:rgba(47,107,255,.12);color:var(--b300)}
+  .p-retry{background:rgba(240,178,60,.10);color:var(--amber)}
+  .p-int{background:rgba(62,216,168,.15);color:var(--mint)}
+  .p-book{background:var(--mint);color:#06231A}
+  .bars{display:flex;gap:4px;align-items:center;height:26px}
+  .bars i{display:block;width:5px;border-radius:3px;background:var(--b300)}
+  .card{border-radius:28px;background:var(--card);border:1px solid var(--line);box-sizing:border-box}
+  .bubble{background:#1E52E0;color:#fff;border-radius:26px 26px 26px 8px;padding:22px 26px;font-size:30px;line-height:1.35}
+  .cal-h{font-size:24px;color:var(--mut);text-align:center;font-weight:500}
+  .slot{border-radius:14px;background:var(--mint);color:#06231A;font-size:21px;font-weight:600;padding:10px 12px;box-sizing:border-box;line-height:1.2}
+</style></head>
+<body><div id="stage"></div>
+<script>
+const ROWS=[
+ ["KP","Kovács Péter","Érd · klímaajánlat · 2024. ápr."],
+ ["NA","Nagy Andrea","Budaörs · hőszivattyú · 2024. szept."],
+ ["TG","Tóth Gábor","Diósd · klímaajánlat · 2025. jan."],
+ ["SÉ","Szabó Éva","Törökbálint · klímatisztítás · 2025. márc."],
+ ["HL","Horváth László","Érd · klímaajánlat · 2025. máj."],
+ ["VZ","Varga Zsolt","Sóskút · hőszivattyú · 2025. jún."],
+ ["KM","Kiss Mónika","Budaörs · klímaajánlat · 2025. aug."],
+];
+const PILL={wait:["p-wait","Várakozik"],call:["p-call","Hívás…"],miss:["p-miss","Nem vette fel"],sms:["p-sms","SMS elküldve"],
+  retry:["p-retry","Újrahívás holnap"],int:["p-int","Érdeklődik"],book:["p-book","Időpont ✓"]};
+const cl=(x,a=0,b=1)=>Math.max(a,Math.min(b,x)), ease=x=>1-Math.pow(1-cl(x),3);
+const at=(t,s,d=.35)=>ease((t-s)/d);
+
+// allapot jelenetenkent: minden jelenet az elozo vegallapotabol indul
+function state(scene,t){
+  const st=Array(7).fill("wait"); let vis=7, hl=-1, sms=0, chip=0, cal=0, slots=0;
+  const seq=(list)=>{ for(const [time,i,s] of list) if(t>=time){ st[i]=s; } };
+  if(scene==="lista"){ vis=0; for(let i=0;i<7;i++) if(t>=.15+i*.22) vis=i+1; }
+  if(scene==="hivas"){
+    seq([[.1,0,"call"],[.7,0,"miss"],[.7,1,"call"],[1.3,1,"int"],[1.3,2,"call"],[1.9,2,"miss"],[1.9,3,"call"],[2.5,3,"miss"],[2.5,4,"call"]]);
+    hl = t<.7?0: t<1.3?1: t<1.9?2: t<2.5?3:4;
+  }
+  if(scene==="sms"||scene==="ujra"||scene==="naptar"){
+    Object.assign(st,["miss","int","miss","miss","call","wait","wait"]);
+  }
+  if(scene==="sms"){ seq([[.3,0,"sms"],[.6,2,"sms"],[.9,3,"sms"]]); sms=at(t,.4,.45); }
+  if(scene==="ujra"||scene==="naptar"){ st[0]=st[2]=st[3]="sms"; st[4]="miss"; }
+  if(scene==="ujra"){ seq([[.15,0,"retry"],[.3,2,"retry"],[.45,3,"retry"],[.6,4,"sms"]]); chip=at(t,.7,.3);
+    seq([[1.4,0,"call"],[1.9,0,"int"],[1.9,2,"call"],[2.4,2,"int"]]); hl = t<1.4?-1: t<1.9?0: t<2.4?2:-1; }
+  if(scene==="naptar"){ st[0]="int"; st[2]="int"; st[3]="retry"; st[4]="sms"; chip=0;
+    cal=at(t,.1,.45); slots = t>=.7?1:0; if(t>=1.2) slots=2; if(t>=1.7) slots=3;
+    if(t>=.7) st[1]="book"; if(t>=1.2) st[0]="book"; if(t>=1.7) st[2]="book"; }
+  return {st,vis,hl,sms,chip,cal,slots};
+}
+
+function pill(k){
+  const [c,txt]=PILL[k];
+  let icon="";
+  if(k==="call"){ icon=`<span class="bars">${[0,1,2,3].map(j=>`<i style="height:${8+Math.abs(Math.sin(window.__t*9+j*1.3))*16}px"></i>`).join("")}</span>`; }
+  return `<div class="pill ${c}">${icon}${txt}</div>`;
+}
+
+function render(scene,t){
+  window.__t=t;
+  const s=state(scene,t);
+  const cnt=k=>s.st.filter((x,i)=>i<s.vis&&k.includes(x)).length;
+  const called=cnt(["miss","int","sms","retry","book"]), smsN=cnt(["sms","retry"])+ (s.st.some(x=>x==="retry")?0:0), booked=cnt(["book"]);
+  let h=`
+   <div class="abs label" style="left:60px;top:230px">VISSZASZERZŐ KAMPÁNY</div>
+   <div class="abs title" style="left:60px;top:272px">Árajánlatot kért, nem rendelt</div>
+   <div class="abs" style="left:60px;top:380px;display:flex;gap:16px">
+     <div class="counter">Hívva <b>${called}</b></div>
+     <div class="counter">SMS <b>${cnt(["sms"])+cnt(["retry"])}</b></div>
+     <div class="counter" style="${booked?'border-color:rgba(62,216,168,.5)':''}">Időpont <b style="${booked?'color:#3ED8A8':''}">${booked}</b></div>
+   </div>`;
+  // lista -- a naptar jelenetben felfele osszecsuszik
+  const listTop=500, gap=118, shrink=s.cal;
+  for(let i=0;i<s.vis;i++){
+    const appear = scene==="lista" ? at(t,.15+i*.22,.3) : 1;
+    let y=listTop+i*gap + (1-appear)*40;
+    // a naptar jelenetben csak az elso harom sor marad (ok kapnak idopontot)
+    let op=appear*(i<3?1:1-shrink);
+    // az SMS-kartya ala eso sorok kiusznak, kulonben beuszas kozben atutnek rajta
+    if(i>=5 && scene==="sms") op*=1-s.sms;
+    if(i>=5 && scene==="ujra") op*=at(t,0,.4);
+    if(op<=0.01||y>1300) continue;
+    h+=`<div class="abs row ${s.hl===i?'hl':''}" style="top:${y}px;opacity:${op}">
+      <div class="av">${ROWS[i][0]}</div>
+      <div class="who"><div class="nm">${ROWS[i][1]}</div><div class="ds">${ROWS[i][2]}</div></div>
+      ${pill(s.st[i])}</div>`;
+  }
+  if(s.sms>0){
+    h+=`<div class="abs card" style="left:60px;top:${1096+(1-s.sms)*60}px;width:960px;padding:30px;opacity:${s.sms};background:#0B1019;border-color:rgba(97,145,255,.35)">
+      <div class="sub" style="font-size:24px;margin-bottom:16px">SMS · Kovács Péter</div>
+      <div class="bubble">Jó napot, Péter! Tavaly klímaajánlatot kért tőlünk. Még aktuális? Egy válasz, és visszahívjuk.</div></div>`;
+  }
+  if(s.chip>0){
+    h+=`<div class="abs" style="left:60px;top:${1330-(s.chip)*20}px;opacity:${s.chip};display:flex;gap:14px;align-items:center">
+      <div class="pill p-retry" style="height:60px;font-size:27px">⟳ Másnap 10:00 · újrahívás</div></div>`;
+  }
+  if(s.cal>0){
+    const x0=60,y0=880,w=960,hh=520, cols=["H","K","Sze","Cs","P"], cw=(w-110)/5;
+    h+=`<div class="abs card" style="left:${x0}px;top:${y0+(1-s.cal)*80}px;width:${w}px;height:${hh}px;opacity:${s.cal}">
+      <div class="abs" style="left:34px;top:26px;font-size:30px;font-weight:600">Naptár · jövő hét</div>`;
+    cols.forEach((c,j)=>h+=`<div class="abs cal-h" style="left:${90+j*cw}px;top:88px;width:${cw}px">${c}</div>`);
+    ["9:00","11:00","14:00","16:00"].forEach((tm,r)=>{
+      h+=`<div class="abs" style="left:22px;top:${150+r*88}px;font-size:21px;color:#646E7F;font-family:'Geist Mono'">${tm}</div>
+          <div class="abs" style="left:90px;top:${140+r*88}px;width:${w-120}px;height:1px;background:rgba(255,255,255,.06)"></div>`;
+    });
+    const SL=[[1,0,"Nagy A.<br>felmérés"],[3,2,"Kovács P.<br>felmérés"],[0,3,"Tóth G.<br>felmérés"]];
+    SL.slice(0,s.slots).forEach(([c,r,txt],k)=>{
+      const born=[.7,1.2,1.7][k], p=at(t,born,.3);
+      h+=`<div class="abs slot" style="left:${92+c*cw}px;top:${146+r*88 - (1-p)*30}px;width:${cw-8}px;height:80px;opacity:${p};transform:scale(${.9+.1*p})">${txt}</div>`;
+    });
+    h+=`</div>`;
+  }
+  document.getElementById("stage").innerHTML=h;
+}
+window.render=render;
+window.SCENES={lista:4.0,hivas:4.0,sms:4.0,ujra:4.0,naptar:4.5};  // a ui_render.py ebbol olvassa
+</script></body></html>

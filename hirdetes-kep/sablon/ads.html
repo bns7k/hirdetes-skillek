@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="hu"><head><meta charset="utf-8">
+<title>Statikus hirdetes — sablon</title>
+<link rel="stylesheet" href="brand.css">
+</head><body>
+
+<!-- ============================================================
+     SABLON. Egy .ad = egy kimeneti PNG.
+     Arany: alap 4:5 feed (1080x1350). Negyzet: class="ad square".
+     Story/reels: class="ad story".
+
+     Render:
+       PY=".../venv/Scripts/python.exe"
+       "$PY" ~/.claude/skills/html-kep/scripts/render.py ads.html              --out ./out --selector ".ad" --prefix ad --width 1200 --height 1400 --wait 1000
+
+     A kepek az assets/ mappabol jonnek. Telefonfotot MINDIG
+     exif_transpose-szal tolts be, kulonben fejjel lefele kerul bele.
+
+     A negy formatum lentebb mind olyan, amit a Meta Hirdetestarban
+     futni lattunk. A valasztasrol: references/formatumok.md
+     ============================================================ -->
+
+<!-- ==========================================================
+     A. KATEGÓRIA-SOROZAT — 3 db, egy sablonból
+     ========================================================== -->
+
+<div class="ad cat">
+  <img class="bg" src="assets/szinpad.jpg" style="--pos:center 58%" alt="">
+  <div class="ribbon">Bérlés és vásárlás</div>
+  <img class="brand" src="assets/wordmark.png" alt="Márkanév">
+  <div class="word">Rendezvény<small>Fesztivál · falunap · adventi vásár</small></div>
+  <div class="chev"><i style="--o:.35"></i><i style="--o:.6"></i><i></i></div>
+</div>
+
+<div class="ad cat">
+  <img class="bg" src="assets/csapat.jpg" style="--pos:44% 56%" alt="">
+  <div class="ribbon">Bérlés és vásárlás</div>
+  <img class="brand" src="assets/wordmark.png" alt="Márkanév">
+  <div class="word">Építkezés<small>Útvonal · rakodó · munkaterület</small></div>
+  <div class="chev"><i style="--o:.35"></i><i style="--o:.6"></i><i></i></div>
+</div>
+
+<div class="ad cat">
+  <img class="bg" src="assets/pult.jpg" style="--pos:58% 62%" alt="">
+  <div class="ribbon">Bérlés és vásárlás</div>
+  <img class="brand" src="assets/wordmark.png" alt="Márkanév">
+  <div class="word">Pult és sátor<small>Stabil alátámasztás füvön is</small></div>
+  <div class="chev"><i style="--o:.35"></i><i style="--o:.6"></i><i></i></div>
+</div>
+
+
+<!-- ==========================================================
+     B. ÖSSZEHASONLÍTÁS — a valódi versenytárs a rétegelt lemez
+     ========================================================== -->
+
+<div class="ad">
+  <div class="vs">
+    <div class="head">
+      <div class="t">[Termék] <span style="color:var(--orange)">vagy</span><br>faforgács és sóder?</div>
+    </div>
+    <div class="cols">
+      <div class="col win">
+        <h3>[Termék]</h3>
+        <img src="assets/szegely.jpg" style="object-fit:cover" alt="">
+        <ul>
+          <li><span class="mark">✓</span><span>Szerszám nélkül <b>kapcsolódik</b></span></li>
+          <li><span class="mark">✓</span><span>A lerakás pillanatában <b>terhelhető</b></span></li>
+          <li><span class="mark">✓</span><span><b>Újra és újra</b> felhasználható</span></li>
+          <li><span class="mark">✓</span><span>A végén <b>felszedjük és elszállítjuk</b></span></li>
+          <li><span class="mark">✓</span><span>A gyep alatta <b>megmarad</b></span></li>
+        </ul>
+      </div>
+      <div class="col lose">
+        <h3>Faforgács, sóder, semmi</h3>
+        <img src="assets/sar.jpg" style="object-fit:cover" alt="">
+        <ul>
+          <li><span class="mark">✕</span><span>Egy eső, és <b>beledolgozódik a talajba</b></span></li>
+          <li><span class="mark">✕</span><span>A gyep alatta <b>kipusztul</b></span></li>
+          <li><span class="mark">✕</span><span>Egyszer használatos, utána <b>hulladék</b></span></li>
+          <li><span class="mark">✕</span><span>Az összeszedés és a helyreállítás <b>a te dolgod</b></span></li>
+          <li><span class="mark">✕</span><span>A számlát <b>te állod</b></span></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot2">
+      <img src="assets/wordmark.png" alt="Márkanév">
+      <span>pelda.hu</span>
+    </div>
+  </div>
+</div>
+
+
+<!-- ==========================================================
+     C. ADATLAP-PLAKÁT — konkrétum, nem szlogen
+     Minden adat a az ügyfél weboldaláról, ellenőrizve.
+     ========================================================== -->
+
+<div class="ad">
+  <div class="spec">
+    <div class="kick">Ideiglenes burkolat · bérlés és vásárlás</div>
+    <h2>Mire kérj<br>árajánlatot?</h2>
+    <div class="rows">
+      <div class="row"><span>Teherbírás</span><b>XX t/m²</b></div>
+      <div class="row"><span>Rögzítés</span><b>szerszám nélkül</b></div>
+      <div class="row"><span>Terhelhető</span><b>azonnal</b></div>
+      <div class="row"><span>Talaj</span><b>fű, homok, egyenetlen</b></div>
+      <div class="row"><span>Szállítás és telepítés</span><b>tőlünk</b></div>
+      <div class="row"><span>Bontás és elszállítás</span><b>tőlünk</b></div>
+    </div>
+    <div class="note">Küldd el a helyszínt, az időpontot és a terület méretét.</div>
+    <div class="url">pelda.hu</div>
+  </div>
+</div>
+
+</body></html>

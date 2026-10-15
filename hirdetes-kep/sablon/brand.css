@@ -1,0 +1,372 @@
+/* ============================================================
+   PÉLDA-MÁRKA — statikus hirdetés design system
+   A ChatGPT-s referenciákból visszafejtve, valódi CSS-ben.
+   Méretek: --S = a vászon szélessége. Minden ebből skálázódik,
+   így 1080x1350 és 1080x1920 ugyanabból a HTML-ből jön ki.
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Noto+Sans:wght@400;600;700&display=swap');
+
+:root {
+  /* --- szín ---------------------------------------------------
+     A narancs a VALÓDI logóból mintázva (#FE7901). A referenciákon
+     ennél sötétebbnek látszik (~#E56200), de az a textúra miatt van,
+     nem másik szín. Lapos felületre a tiszta logószínt tedd. */
+  --orange:      #FE7901;
+  --orange-deep: #E56200;
+  --orange-dark: #B44C00;
+
+  --ink:      #07080A;   /* a háttér: majdnem fekete, kékes árnyalattal */
+  --ink-2:    #121417;   /* panelek */
+  --ink-3:    #1B1E22;   /* panel-kiemelés */
+  --paper:    #F2F2F0;   /* fejléc-fehér, nem tiszta fehér */
+  --muted:    #9AA0A6;
+
+  --hair: 2px;           /* a narancs hajszálvonal vastagsága */
+  --cut: 26px;           /* a levágott sarok mérete — a hexagon-motívum */
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body { background: #222; display: flex; flex-wrap: wrap; gap: 24px; padding: 24px; }
+
+/* ============================================================
+   1. A VÁSZON
+   ============================================================ */
+.ad {
+  /* --S MERTEKEGYSEG NELKUL! Ha px-ben adod meg, a --R is hosszusag lesz,
+     es minden calc(96px * var(--R)) ervenytelen -> az egesz layout szetesik.
+     Ez CSS-ben nem hibauzenet, csak csendben visszaesik az alapertekre. */
+  --S: 1080;
+  --R: calc(var(--S) / 1080);      /* skálafaktor: mértékegység nélküli szám */
+  position: relative;
+  width: calc(var(--S) * 1px);
+  height: calc(var(--S) * 1.25px); /* 4:5 feed. Story: állítsd 1.7778-ra */
+  background: var(--ink);
+  overflow: hidden;
+  font-family: 'Noto Sans', sans-serif;
+  color: var(--paper);
+}
+.ad.story { height: calc(var(--S) * 1.7778px); }
+.ad.square { height: calc(var(--S) * 1px); }
+
+/* Hexagon-vízjel a háttéren. A referenciákon végig ott van, nagyon halkan —
+   ez köti a képet a termékhez akkor is, amikor nem látszik burkolat. */
+.ad::before {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='208' viewBox='0 0 240 208'><g fill='none' stroke='%23ffffff' stroke-width='3'><path d='M60 0 120 34.6 120 103.9 60 138.5 0 103.9 0 34.6Z'/><path d='M180 0 240 34.6 240 103.9 180 138.5 120 103.9 120 34.6Z'/><path d='M120 103.9 180 138.5 180 207.8 120 242.4 60 207.8 60 138.5Z'/></g></svg>");
+  background-size: calc(300px * var(--R));
+  opacity: .055;
+}
+
+/* Sarok-fény: a referenciákon a háttér nem egyenletes fekete. */
+.ad::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background:
+    radial-gradient(90% 55% at 78% 8%,  rgba(255,255,255,.07), transparent 70%),
+    radial-gradient(70% 45% at 0% 100%, rgba(254,121,1,.07),  transparent 70%);
+}
+
+.layer { position: relative; z-index: 2; height: 100%;
+         padding: calc(52px * var(--R)); display: flex; flex-direction: column; }
+
+/* ============================================================
+   2. TIPOGRÁFIA
+   ============================================================ */
+
+/* A fejléc-betű. Archivo változó fonttal, keskenyre húzva.
+   FIGYELEM: a wdth tengely csak akkor él, ha a Google Fonts URL kéri
+   (wdth,wght@62..125,400..900). Enélkül a font-stretch néma marad. */
+.h {
+  font-family: 'Archivo', sans-serif;
+  font-weight: 700;
+  font-stretch: 72%;
+  line-height: .96;
+  letter-spacing: -.005em;
+  text-transform: uppercase;
+  font-size: calc(96px * var(--R));
+}
+.h.mixed { text-transform: none; font-stretch: 84%; font-weight: 800; }
+.h.sm  { font-size: calc(72px * var(--R)); }
+.h.lg  { font-size: calc(124px * var(--R)); }
+
+/* A HATÁS: a betűk beton-textúrával vannak kitöltve, nem lapos színnel.
+   Ez az, amitől a referencia nem néz ki Canva-sablonnak. */
+.tex, .tex-o {
+  background-repeat: repeat;
+  background-size: calc(620px * var(--R));
+  -webkit-background-clip: text; background-clip: text;
+  color: transparent;
+  /* A vetett árnyék adja a mélységet; enélkül a textúra piszoknak látszik. */
+  filter: drop-shadow(0 calc(4px * var(--R)) calc(5px * var(--R)) rgba(0,0,0,.85));
+}
+.tex   { background-image: url("assets/texture-light.png"); }
+.tex-o { background-image: linear-gradient(rgba(254,121,1,.94), rgba(254,121,1,.94)),
+                          url("assets/texture-light.png");
+         background-blend-mode: multiply, normal; }
+
+/* Narancs hajszálvonal a fejléc alatt — rövid, nem teljes szélességű. */
+.rule { width: calc(150px * var(--R)); height: calc(4px * var(--R));
+        background: var(--orange); margin: calc(22px * var(--R)) 0; }
+
+.lead { font-size: calc(33px * var(--R)); line-height: 1.34; color: #DCDEE0;
+        max-width: calc(560px * var(--R)); }
+.lead b { color: var(--orange); font-weight: 600; }
+
+/* Kiskapitális szalag: "RENDEZVÉNYEK • ÉPÍTKEZÉSEK • IDEIGLENES PARKOLÓK" */
+.kicker { font-family: 'Archivo', sans-serif; font-weight: 700; font-stretch: 88%;
+          font-size: calc(25px * var(--R)); letter-spacing: .13em;
+          text-transform: uppercase; color: #C9CDD1; }
+.kicker i { color: var(--orange); font-style: normal; margin: 0 calc(14px * var(--R)); }
+
+/* ============================================================
+   3. A LEVÁGOTT SAROK — ez a rendszer gerince
+   A referencián MINDEN doboz sarka le van vágva. Ez viszi tovább
+   a hexagon-formát anélkül, hogy hatszöget kéne rajzolni.
+   ============================================================ */
+.cut      { clip-path: polygon(var(--cut) 0, 100% 0, 100% calc(100% - var(--cut)), calc(100% - var(--cut)) 100%, 0 100%, 0 var(--cut)); }
+.cut-r    { clip-path: polygon(0 0, calc(100% - var(--cut)) 0, 100% var(--cut), 100% 100%, var(--cut) 100%, 0 calc(100% - var(--cut))); }
+.cut-all  { clip-path: polygon(var(--cut) 0, calc(100% - var(--cut)) 0, 100% var(--cut), 100% calc(100% - var(--cut)), calc(100% - var(--cut)) 100%, var(--cut) 100%, 0 calc(100% - var(--cut)), 0 var(--cut)); }
+
+/* Narancs kerettel: két egymásra tett réteg, mert a clip-path levágja a bordert. */
+.framed { position: relative; background: var(--orange); padding: var(--hair); }
+.framed > * { background: var(--ink-2); }
+
+/* ============================================================
+   ⚠️  AZ ALÁBBI KÉT KOMPONENS NEM HIRDETÉSRE VALÓ
+   A Meta Hirdetéstárban megvizsgált ~40 kategóriabeli kreatív
+   közül EGYETLENEGYEN sem volt képbe égetett CTA-gomb, és
+   egyiken sem volt ikoncsempe-sor. A Meta úgyis odateszi a
+   saját gombját a kép alá — a ráégetett gomb csak azt kiabálja,
+   hogy „ez hirdetés".
+   Carousel-lapra, GYIK-re, Story-ra jók. Hideg feedbe NEM.
+   ============================================================ */
+
+/* ============================================================
+   4. IKON-CSEMPÉK  (a "Gyors telepítés / Nagy teherbírás" sor)
+   ============================================================ */
+.chips { display: flex; gap: calc(16px * var(--R)); }
+.chip {
+  flex: 1; background: var(--ink-2); border: var(--hair) solid rgba(254,121,1,.45);
+  padding: calc(24px * var(--R)) calc(16px * var(--R));
+  text-align: center;
+  --cut: calc(20px * var(--R));
+}
+.chip svg { width: calc(58px * var(--R)); height: calc(58px * var(--R));
+            stroke: var(--paper); fill: none; stroke-width: 5;
+            stroke-linecap: round; stroke-linejoin: round; }
+.chip .t { margin-top: calc(12px * var(--R)); font-size: calc(24px * var(--R));
+           line-height: 1.22; }
+.chip .t b { display: block; color: var(--orange); font-weight: 700;
+             font-family: 'Archivo', sans-serif; font-stretch: 88%;
+             text-transform: uppercase; letter-spacing: .04em; }
+
+/* ============================================================
+   5. A GOMB  (CTA-sáv)
+   A referencia legerősebb eleme. Narancs hexagon-blokk nyíllal,
+   mellette sötét sáv nagy felirattal, körül narancs hajszálkeret.
+   ============================================================ */
+.cta {
+  display: flex; align-items: stretch; margin-top: auto;
+  /* FIGYELEM: ha egy masik elem (pl. .chips) is margin-top:auto-t kap,
+     a ket auto SZETOSZTJA a szabad helyet, es luk marad kozottuk.
+     Egy vasznon csak EGY elem tolhat auto-val. */
+  background: var(--orange); padding: var(--hair); gap: var(--hair);
+  --cut: calc(30px * var(--R));
+}
+.cta > .arrow {
+  background: var(--orange); display: grid; place-items: center;
+  width: calc(128px * var(--R));
+}
+.cta > .arrow svg { width: calc(52px * var(--R)); height: calc(52px * var(--R));
+                    stroke: #0B0B0B; stroke-width: 7; fill: none;
+                    stroke-linecap: round; stroke-linejoin: round; }
+.cta > .label {
+  flex: 1; background: var(--ink); display: flex; align-items: center;
+  justify-content: center; gap: calc(18px * var(--R));
+  padding: calc(30px * var(--R)) calc(24px * var(--R));
+  font-family: 'Archivo', sans-serif; font-weight: 700; font-stretch: 82%;
+  font-size: calc(46px * var(--R)); text-transform: uppercase;
+  letter-spacing: .01em;
+}
+.cta .o { color: var(--orange); }
+
+/* Tömör narancs változat — ha a CTA-nak egyedül kell vinnie a képet. */
+.cta.solid > .label { background: var(--orange); color: #0B0B0B; }
+.cta.solid .o { color: #0B0B0B; }
+
+/* ============================================================
+   6. FOTÓ-BEILLESZTÉS
+   A referencián a fotó sosem téglalap: átlósan van bevágva,
+   és a vágás mentén narancs hajszálvonal fut.
+   ============================================================ */
+.photo { position: absolute; inset: 0; z-index: 1; overflow: hidden; }
+.photo img { width: 100%; height: 100%; object-fit: cover; display: block;
+             object-position: var(--pos, center); }
+
+/* Jobb felső sarok, átlós vágás — ez a leggyakoribb elrendezés. */
+.photo.corner { clip-path: polygon(46% 0, 100% 0, 100% 62%, 26% 62%); }
+.photo.corner::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(to right, rgba(7,8,10,.96) 0%, rgba(7,8,10,.25) 26%, transparent 52%);
+}
+/* Teljes szélességű fotósáv NORMÁL FLOW-ban.
+   Ne abszolút pozícióval told a helyére: a szöveg hossza változik, és
+   minden új szövegnél újra kell találgatnod a pixeleket. Így a fotó
+   egyszerűen kitölti, ami a szöveg és a CTA között marad. */
+.shot { position: relative; flex: 1; min-height: calc(300px * var(--R));
+        margin: calc(30px * var(--R)) calc(-52px * var(--R)) calc(34px * var(--R));
+        overflow: hidden; }
+.shot img { width: 100%; height: 100%; object-fit: cover; display: block;
+            object-position: var(--pos, center); }
+/* Felül lágy átmenet a háttérbe, hogy a fotó ne "ragasztott" téglalap legyen. */
+.shot.fade::after { content: ''; position: absolute; inset: 0; pointer-events: none;
+        background: linear-gradient(rgba(7,8,10,.9), transparent 22%); }
+
+/* Fél-fél osztás átlós vágással (előtte/utána). */
+.split { position: relative; display: flex; overflow: hidden; }
+.split > div { position: relative; flex: 1; overflow: hidden; }
+.split > div img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.split > div:first-child { clip-path: polygon(0 0, 100% 0, calc(100% - 130px) 100%, 0 100%); }
+.split > div:last-child  { margin-left: calc(-128px * var(--R));
+                           background: var(--orange);
+                           clip-path: polygon(calc(128px * var(--R)) 0, 100% 0, 100% 100%, 0 100%); }
+/* Narancs vonal a vágás mentén, SZÖGSZÁMÍTÁS NÉLKÜL: a doboz háttere narancs,
+   a kép ugyanazzal a poligonnal van vágva, csak pár pixellel beljebb.
+   A kilátszó sáv maga a vonal — és akármekkora a magasság, pontos marad. */
+.split > div:last-child img {
+        clip-path: polygon(calc(134px * var(--R)) 0, 100% 0, 100% 100%, calc(6px * var(--R)) 100%); }
+
+/* Címke a fotó sarkában: ELŐTTE / UTÁNA / A / B */
+.tag { position: absolute; z-index: 3;
+       font-family: 'Archivo', sans-serif; font-weight: 700; font-stretch: 84%;
+       text-transform: uppercase; letter-spacing: .1em;
+       font-size: calc(28px * var(--R));
+       padding: calc(14px * var(--R)) calc(30px * var(--R));
+       background: var(--ink-2); color: var(--paper);
+       --cut: calc(18px * var(--R)); }
+.tag.on { background: var(--orange); color: #0B0B0B; }
+
+/* ============================================================
+   7. FEJ ÉS LÁB
+   ============================================================ */
+.logo { height: calc(74px * var(--R)); width: auto; display: block;
+        /* A .layer flex-oszlop, es alapbol STRETCH-eli a gyerekeit teljes
+           szelessegre -> a logo szetlapul. Ez kell ellene. */
+        align-self: flex-start; }
+
+.foot { display: flex; align-items: center; gap: calc(26px * var(--R));
+        margin-top: calc(26px * var(--R));
+        font-size: calc(22px * var(--R)); color: #AEB3B8; }
+.foot .dot { width: calc(5px * var(--R)); height: calc(5px * var(--R));
+             background: var(--orange); border-radius: 50%; }
+.foot .url { margin-left: auto; color: var(--orange); font-weight: 700; }
+
+
+/* ============================================================
+   v2 — a terepkutatás után.
+   Három változás mindenhol, és mind a három bizonyítékon alapul:
+     1. NINCS képbe égetett CTA-gomb. A vizsgált ~40 kreatív közül
+        egyetlenegyen sem volt. A Facebook úgyis odarakja a sajátját.
+     2. NINCS ikoncsempe-sor. Zaj a feedben.
+     3. A fejléc 3-6 szó. Ennél több nem olvasódik el görgetés közben.
+   A logó kicsi és halk (Motion/Ankit Patel: a márka a landingen épül,
+   nem a hirdetésen).
+   ============================================================ */
+
+/* --- 1. KATEGÓRIA-SOROZAT ---------------------------------
+   Az A&M Lloyd Plant Hire mintája: EGY sablon, sok kreatív,
+   csak a fotó és egyetlen szó változik. Ez adja a kreatív-
+   volument, ami az Andromeda-korszakban strukturális előny. */
+.cat { position: relative; }
+.cat > img.bg { position: absolute; inset: 0; width: 100%; height: 100%;
+             object-fit: cover; object-position: var(--pos, center); z-index: 1; }
+/* Alsó sötétítés, hogy a felirat bármilyen fotón olvasható legyen. */
+.cat::after { content: ''; position: absolute; inset: 0; z-index: 2;
+  background: linear-gradient(transparent 38%, rgba(6,7,9,.55) 66%, rgba(6,7,9,.9));
+  pointer-events: none; }
+
+.cat .brand { position: absolute; z-index: 4; top: calc(40px * var(--R));
+              left: calc(40px * var(--R)); height: calc(52px * var(--R)); opacity: .95; }
+
+/* Sarokszalag — a bérlés/vásárlás tény, nem szlogen. */
+.cat .ribbon { position: absolute; z-index: 4; right: calc(-124px * var(--R));
+  top: calc(96px * var(--R)); transform: rotate(45deg); transform-origin: center;
+  background: var(--orange); color: #0B0B0B; text-align: center;
+  padding: calc(10px * var(--R)) calc(150px * var(--R));
+  font-family: Archivo, sans-serif; font-weight: 800; font-stretch: 88%;
+  font-size: calc(20px * var(--R)); letter-spacing: .09em; text-transform: uppercase; }
+
+.cat .word { position: absolute; z-index: 4; left: calc(48px * var(--R));
+  bottom: calc(54px * var(--R)); max-width: calc(760px * var(--R));
+  font-family: Archivo, sans-serif; font-weight: 800; font-stretch: 74%;
+  font-size: calc(104px * var(--R)); line-height: .92; text-transform: uppercase;
+  color: #fff; text-shadow: 0 calc(5px * var(--R)) calc(22px * var(--R)) rgba(0,0,0,.9); }
+.cat .word small { display: block; font-size: calc(30px * var(--R));
+  font-stretch: 92%; font-weight: 700; letter-spacing: .06em;
+  color: var(--orange); margin-top: calc(12px * var(--R)); }
+
+.cat .chev { position: absolute; z-index: 4; right: calc(44px * var(--R));
+  bottom: calc(60px * var(--R)); display: flex; gap: calc(6px * var(--R)); }
+.cat .chev i { width: calc(20px * var(--R)); height: calc(52px * var(--R));
+  background: var(--orange); opacity: var(--o, 1);
+  clip-path: polygon(0 0, 55% 0, 100% 50%, 55% 100%, 0 100%, 45% 50%); }
+
+/* --- 2. ÖSSZEHASONLÍTÁS (Us vs Them) -----------------------
+   A GroundGuards leghosszabb futó kreatívja pontosan ez
+   ("Composite Mats VS Plywood Boards"), és a Motion + Dara Denney
+   is egyetért, hogy ez működő formátum. Nálunk a valódi
+   versenytárs amúgy sem egy másik burkolatcég. */
+.vs { display: flex; flex-direction: column; height: 100%; }
+.vs .head { padding: calc(42px * var(--R)) calc(44px * var(--R)) calc(26px * var(--R));
+            text-align: center; }
+.vs .head .t { font-family: Archivo, sans-serif; font-weight: 800; font-stretch: 76%;
+  font-size: calc(62px * var(--R)); line-height: .98; text-transform: uppercase; }
+.vs .cols { flex: 1; display: flex; gap: calc(3px * var(--R)); }
+.vs .col { flex: 1; padding: calc(30px * var(--R)) calc(26px * var(--R)); }
+.vs .col.win { background: var(--orange); color: #0B0B0B; }
+.vs .col.lose { background: var(--ink-2); color: #C8CCD0; }
+.vs .col h3 { font-family: Archivo, sans-serif; font-weight: 800; font-stretch: 80%;
+  font-size: calc(40px * var(--R)); text-transform: uppercase; line-height: 1.05;
+  /* Ket sor helyet MINDIG tart, kulonben a ket oszlop kepe elcsuszik egymashoz kepest. */
+  min-height: calc(84px * var(--R)); margin-bottom: calc(16px * var(--R)); }
+.vs .col img { width: 100%; height: calc(330px * var(--R)); object-fit: cover;
+               margin-bottom: calc(22px * var(--R)); }
+.vs .col ul { list-style: none; }
+.vs .col li { display: flex; gap: calc(12px * var(--R));
+  font-size: calc(30px * var(--R)); line-height: 1.3;
+  margin-bottom: calc(22px * var(--R)); }
+.vs .col li b { font-weight: 800; }
+.vs .mark { flex: none; width: calc(30px * var(--R)); font-weight: 800;
+            font-size: calc(30px * var(--R)); line-height: 1.1; }
+.vs .col.win .mark { color: #0B0B0B; }
+.vs .col.lose .mark { color: #E2554A; }
+.vs .foot2 { display: flex; align-items: center; justify-content: space-between;
+  padding: calc(24px * var(--R)) calc(44px * var(--R)); background: var(--ink); }
+.vs .foot2 img { height: calc(46px * var(--R)); }
+.vs .foot2 span { font-size: calc(25px * var(--R)); color: var(--orange); font-weight: 700; }
+
+/* --- 3. ADATLAP-PLAKÁT -------------------------------------
+   A Toone Waste Management mintája. Csúnya, de minden rajta
+   van, ami a döntéshez kell. Ez a helyi szakma nyelve, és
+   ez felel meg a "konkrét spec az első sorban" mintázatnak,
+   ami MINDEN hosszú futó hirdetésben közös volt. */
+.spec { height: 100%; background: var(--orange); color: #0B0B0B;
+        display: flex; flex-direction: column; justify-content: center;
+        text-align: center;
+        padding: calc(54px * var(--R)) calc(46px * var(--R)); }
+.spec .kick { font-family: Archivo, sans-serif; font-weight: 800; font-stretch: 90%;
+  font-size: calc(27px * var(--R)); letter-spacing: .16em; text-transform: uppercase; }
+.spec h2 { font-family: Archivo, sans-serif; font-weight: 800; font-stretch: 72%;
+  font-size: calc(96px * var(--R)); line-height: .92; text-transform: uppercase;
+  margin: calc(26px * var(--R)) 0; }
+.spec .rows { background: #0B0B0B; color: #F2F2F0; margin: calc(10px * var(--R)) 0; }
+.spec .row { display: flex; justify-content: space-between; align-items: baseline;
+  padding: calc(26px * var(--R)) calc(28px * var(--R));
+  border-bottom: 1px solid #2A2D31; font-size: calc(30px * var(--R)); }
+.spec .row:last-child { border-bottom: 0; }
+.spec .row b { font-family: Archivo, sans-serif; font-weight: 800; font-stretch: 86%;
+  font-size: calc(36px * var(--R)); color: var(--orange); }
+.spec .note { margin-top: calc(30px * var(--R)); font-size: calc(27px * var(--R)); font-weight: 600; }
+.spec .url { font-family: Archivo, sans-serif; font-weight: 800; font-stretch: 86%;
+  font-size: calc(44px * var(--R)); margin-top: calc(14px * var(--R)); }

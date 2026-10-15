@@ -1,0 +1,131 @@
+{
+  "_comment": [
+    "EGY VIDEO. A marka-beallitasokat a client.json adja.",
+    "",
+    "beat.text  - amit a hang mond ES amit a felirat ir. A ketto ugyanaz.",
+    "beat.emoji - {char, on}: az emoji arra a SZORA esik. Vagy sima string: egesz beat.",
+    "beat.shot  - uj klippet nyit. null = az elozo klipp folytatodik.",
+    "",
+    "ALLOKEP:  {img, center:[cx,cy], zoom:[honnan,hova], drift:[dx,dy]}",
+    "  center 0-1 a forraskepen | zoom 1.0 = legszelesebb 9:16 kivagas",
+    "  6 mp folott automatikusan felvagja, a mozgast folytatva",
+    "",
+    "VIDEO:    {clip, trim_start, speed}",
+    "  NEM vagja fel - egy valodi felvetel maradjon egyben",
+    "",
+    "szakasz    - horog|tet|megoldas|felsorolas|kockazat|cta. Oroklodik. EBBOL jon",
+    "             az automatikus vagas (flash/slide/whip/punch); emoji es hang a szovegbol.",
+    "cut/emoji/sfx - csak ha felul akarod irni az automatikat. false = itt ne legyen."
+  ],
+  "id": "a-elso-video",
+  "client": "client.json",
+  "beats": [
+    {
+      "text": "Itt a horog. Egy felismerheto helyzet vagy kerdes.",
+      "shot": {
+        "img": "media/kep1.jpg",
+        "center": [
+          0.5,
+          0.58
+        ],
+        "zoom": [
+          1.0,
+          1.24
+        ],
+        "drift": [
+          0.02,
+          0.01
+        ]
+      },
+      "szakasz": "horog"
+    },
+    {
+      "text": "Itt a tet. Mi forog kockan, ha nem csinal semmit.",
+      "shot": null,
+      "szakasz": "tet"
+    },
+    {
+      "text": "Ez a megoldas, es ettol mukodik.",
+      "shot": {
+        "clip": "media/felvetel1.mp4",
+        "trim_start": 2.4,
+        "speed": 1.0
+      },
+      "szakasz": "megoldas"
+    },
+    {
+      "text": "Ide,",
+      "shot": {
+        "img": "media/kep2.jpg",
+        "center": [
+          0.5,
+          0.5
+        ],
+        "zoom": [
+          1.1,
+          1.26
+        ],
+        "drift": [
+          0.0,
+          0.02
+        ]
+      },
+      "szakasz": "felsorolas"
+    },
+    {
+      "text": "ide,",
+      "shot": {
+        "img": "media/kep3.jpg",
+        "center": [
+          0.5,
+          0.5
+        ],
+        "zoom": [
+          1.1,
+          1.26
+        ],
+        "drift": [
+          0.02,
+          0.0
+        ]
+      }
+    },
+    {
+      "text": "es ide.",
+      "shot": {
+        "img": "media/kep4.jpg",
+        "center": [
+          0.5,
+          0.5
+        ],
+        "zoom": [
+          1.1,
+          1.26
+        ],
+        "drift": [
+          -0.02,
+          0.01
+        ]
+      }
+    },
+    {
+      "text": "Kattints ide, es kerj tolunk arajanlatot.",
+      "shot": {
+        "img": "media/kep1.jpg",
+        "center": [
+          0.5,
+          0.55
+        ],
+        "zoom": [
+          1.25,
+          1.05
+        ],
+        "drift": [
+          0.0,
+          -0.02
+        ]
+      },
+      "szakasz": "cta"
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "_comment": [
+    "MARKA-szintu beallitasok. Ugyfelenkent EGYSZER allitod be.",
+    "Minden szkript orokli; amit a szkript megad, az felulirja."
+  ],
+
+  "voice_id": "IDE_JON_AZ_ELEVENLABS_VOICE_ID",
+  "model": "eleven_multilingual_v2",
+  "voice_settings": {
+    "stability": 0.55,
+    "similarity_boost": 0.8,
+    "style": 0.0,
+    "use_speaker_boost": true,
+    "speed": 0.93
+  },
+
+  "music": "zene/alap.mp3",
+  "music_start": 0.0,
+  "music_db": -24,
+
+  "caption_size": 84,
+  "caption_margin": 430,
+  "emoji_size": 118,
+  "emoji_hold": 1.8,
+  "max_clip_sec": 6.0,
+
+  "_logo": "Ha van az ugyfelnek logoja, EZT hasznald -- felulirja a badge-et.",
+  "logo": {
+    "file": "media/wordmark.png",
+    "width": 430, "x": 46, "y": 46, "shadow": true
+  },
+
+  "_badge": "Csak akkor, ha NINCS hasznalhato logo. Torold a logo blokkot.",
+  "badge": {
+    "brand": "MARKANEV",
+    "claim": "EGY ROVID ALLITAS",
+    "size": 28, "x": 46, "y": 50
+  },
+
+  "cta": {
+    "text": "KÉRJ ÁRAJÁNLATOT",
+    "size": 54, "y": 1170
+  }
+}
